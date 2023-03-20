@@ -18,10 +18,12 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
+use Tests\Benchmark\PackerDTO\PurchaseDTO as PackerPurchaseDTO;
 use Tests\Benchmark\YzenDTO\PurchaseDTO as YzenPurchaseDTO;
 use Tests\Benchmark\CuyzDTO\PurchaseDTO as CuyzPurchaseDTO;
 use Tests\Benchmark\EventSauceDTO\PurchaseDTO as EventSaucePurchaseDTO;
 use Tests\Benchmark\SpatieDTO\PurchaseDTO as SpatiePurchaseDTO;
+use Tests\Benchmark\SimpleDTO\PurchaseDTO as DragonPurchaseDTO;
 
 /**
  * Class CheckBench
@@ -34,67 +36,53 @@ class FullCheckBench extends TestCase
 {
 
     public static FileLoader $fileLoaderForJane;
+    
+    private array $data;
+    
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        $this->data = $this->getPurcheseObject();
+        parent::__construct($name, $data, $dataName);
+    }
 
 
     /**
-     * @Revs(5000)
+     * @Revs(500)
+     * @Iterations(10)
+     */
+    public function benchPerfilovVersion(): void
+    {
+        new PackerPurchaseDTO($this->data);
+    }
+
+
+    /**
+     * @Revs(500)
+     * @Iterations(10)
      */
     public function benchYzenVersion(): void
     {
-        $data = $this->getPurcheseObject();
-        ClassTransformer::transform(YzenPurchaseDTO::class, $data);
+        ClassTransformer::transform(YzenPurchaseDTO::class, $this->data);
 
     }
 
 
     /**
-     * @Revs(5000)
+     * @Revs(500)
+     * @Iterations(10)
      */
     public function benchSpatieVersion(): void
     {
-        $data = $this->getPurcheseObject();
-        new SpatiePurchaseDTO($data);
+        new SpatiePurchaseDTO($this->data);
     }
 
     /**
-     * @Revs(5000)
-     */
-    public function benchEventSauceVersion(): void
-    {
-        $data = $this->getPurcheseObject();
-        $mapper = new ObjectMapperUsingReflection();
-        $s = $mapper->hydrateObject(EventSaucePurchaseDTO::class, $data);
-    }
-
-    /**
-     * @Revs(5000)
-     */
-    public function benchSymphonyVersion(): void
-    {
-        $data = $this->getPurcheseObject();
-
-        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
-        $serializer = new Serializer([$normalizer]);
-        $serializer->denormalize($data, YzenPurchaseDTO::class);
-    }
-
-    /**
-     * @Revs(5000)
-     */
-    public function benchCuyzVersion(): void
-    {
-        $data = $this->getPurcheseObject();
-        (new \CuyZ\Valinor\MapperBuilder())
-            ->mapper()
-            ->map(CuyzPurchaseDTO::class, \CuyZ\Valinor\Mapper\Source\Source::array($data));
-    }
-
-    /**
-     * @Revs(10)
+     * @Revs(500)
+     * @Iterations(10)
      */
     public function benchJaneVersion(): void
     {
-        if (!isset(static::$fileLoaderForJane)) {
+        if (false === isset(static::$fileLoaderForJane)) {
             $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
             static::$fileLoaderForJane = new FileLoader(new Generator(
                 (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
@@ -103,10 +91,50 @@ class FullCheckBench extends TestCase
 
         }
 
-        $data = $this->getPurcheseObject();
-
         $autoMapper = AutoMapper::create(true, static::$fileLoaderForJane);
-        $autoMapper->map($data, YzenPurchaseDTO::class);
+        $autoMapper->map($this->data, YzenPurchaseDTO::class);
+    }
+
+    /**
+     * @Revs(500)
+     * @Iterations(10)
+     */
+    public function benchEventSauceVersion(): void
+    {
+        $mapper = new ObjectMapperUsingReflection();
+        $mapper->hydrateObject(EventSaucePurchaseDTO::class, $this->data);
+    }
+
+
+    /**
+     * @Revs(500)
+     * @Iterations(10)
+     */
+    public function benchDragonVersion(): void
+    {
+        new DragonPurchaseDTO($this->data);
+    }
+
+    /**
+     * @Revs(500)
+     * @Iterations(10)
+     */
+    public function benchSymphonyVersion(): void
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer([$normalizer]);
+        $serializer->denormalize($this->data, YzenPurchaseDTO::class);
+    }
+
+    /**
+     * @Revs(500)
+     * @Iterations(10)
+     */
+    public function benchCuyzVersion(): void
+    {
+        (new \CuyZ\Valinor\MapperBuilder())
+            ->mapper()
+            ->map(CuyzPurchaseDTO::class, \CuyZ\Valinor\Mapper\Source\Source::array($this->data));
     }
 
     public function getPurcheseObject(): array
