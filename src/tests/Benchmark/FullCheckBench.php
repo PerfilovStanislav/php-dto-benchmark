@@ -2,7 +2,7 @@
 
 namespace Tests\Benchmark;
 
-use ClassTransformer\ClassTransformer;
+use ClassTransformer\Hydrator;
 use Doctrine\Common\Annotations\AnnotationReader;
 use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use Jane\Component\AutoMapper\AutoMapper;
@@ -47,40 +47,21 @@ class FullCheckBench extends TestCase
 
 
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchPerfilovVersion(): void
+    public function benchPerfilov(): void
     {
         new PackerPurchaseDTO($this->data);
     }
 
-
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchYzenVersion(): void
-    {
-        ClassTransformer::transform(YzenPurchaseDTO::class, $this->data);
-
-    }
-
-
-    /**
-     * @Revs(500)
-     * @Iterations(10)
-     */
-    public function benchSpatieVersion(): void
-    {
-        new SpatiePurchaseDTO($this->data);
-    }
-
-    /**
-     * @Revs(500)
-     * @Iterations(10)
-     */
-    public function benchJaneVersion(): void
+    public function benchJane(): void
     {
         if (false === isset(static::$fileLoaderForJane)) {
             $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -95,11 +76,34 @@ class FullCheckBench extends TestCase
         $autoMapper->map($this->data, YzenPurchaseDTO::class);
     }
 
+
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchEventSauceVersion(): void
+    public function benchYzen(): void
+    {
+        Hydrator::init()->create(YzenPurchaseDTO::class, $this->data);
+    }
+
+
+    /**
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
+     */
+    public function benchSpatie(): void
+    {
+        new SpatiePurchaseDTO($this->data);
+    }
+
+    /**
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
+     */
+    public function benchEventSauce(): void
     {
         $mapper = new ObjectMapperUsingReflection();
         $mapper->hydrateObject(EventSaucePurchaseDTO::class, $this->data);
@@ -107,19 +111,21 @@ class FullCheckBench extends TestCase
 
 
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchDragonVersion(): void
+    public function benchDragon(): void
     {
         new DragonPurchaseDTO($this->data);
     }
 
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchSymphonyVersion(): void
+    public function benchSymphony(): void
     {
         $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
         $serializer = new Serializer([$normalizer]);
@@ -127,10 +133,11 @@ class FullCheckBench extends TestCase
     }
 
     /**
-     * @Revs(500)
-     * @Iterations(10)
+     * @Revs(1500)
+     * @Iterations(11)
+     * @Warmup(3)
      */
-    public function benchCuyzVersion(): void
+    public function benchCuyz(): void
     {
         (new \CuyZ\Valinor\MapperBuilder())
             ->mapper()

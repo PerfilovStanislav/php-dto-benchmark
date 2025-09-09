@@ -1,14 +1,32 @@
 {
   "name": "perfilov/php-dto-benchmark",
-  "description": "Test php dto libraries",
-  "minimum-stability": "dev",
+  "description": "Benchmark suite for comparing PHP DTO, serializer, hydrator and mapper libraries.",
+  "type": "project",
+  "minimum-stability": "stable",
   "prefer-stable": true,
   "license": "MIT",
-  "keywords": [],
+  "keywords": [
+    "php",
+    "dto",
+    "data transfer object",
+    "serializer",
+    "hydrator",
+    "mapper",
+    "packer",
+    "benchmark",
+    "performance",
+    "profiling",
+    "testing",
+    "comparison"
+  ],
+  "version": "1.1.0",
+  "time": "2025-09-09",
   "authors": [
     {
       "name": "Perfilov Stanislav",
-      "email": "stanislav.perfilov@gmail.com"
+      "email": "stanislav.perfilov@gmail.com",
+      "homepage": "https://beacons.ai/stanislavperfilov",
+      "role": "developer"
     }
   ],
   "autoload": {
@@ -22,20 +40,23 @@
   },
   "require": {
     "php": ">=8.1",
-    "yzen.dev/plain-to-class": "dev-feature/v2-php8.1",
-    "eventsauce/object-hydrator": "^1.1",
-    "jane-php/automapper": "^7.4",
+    "phpbench/phpbench": "1.2.8",
+    "yzen.dev/plain-to-class": "^3.0",
+    "eventsauce/object-hydrator": "^1.6",
+    "jane-php/automapper": "^7.5",
     "phpdocumentor/reflection-docblock": "^5.3",
-    "cuyz/valinor": "^1.2",
+    "cuyz/valinor": "^2.1",
     "spatie/data-transfer-object": "^3.9",
-    "symfony/property-access": "^6.2",
-    "symfony/serializer": "^6.2",
-    "perfilov/php-dto-packer": "^3.0",
-    "dragon-code/simple-dto": "^2.7"
+    "symfony/property-access": "^6.4",
+    "symfony/serializer": "^6.3",
+    "perfilov/php-dto-packer": "^5.1",
+    "dragon-code/simple-dto": "^2.8"
   },
   "require-dev": {
-    "phpbench/phpbench": "1.2.8",
     "phpunit/phpunit": "9.5.28",
     "symfony/var-dumper": "^6.2"
+  },
+  "scripts": {
+    "test": "php ./vendor/bin/phpbench run tests/Benchmark/FullCheckBench.php --report='{\"extends\": \"aggregate\", \"cols\": [\"subject\", \"mem_peak\", \"best\", \"worst\", \"mean\", \"mode\"]}'\n"
   }
 }

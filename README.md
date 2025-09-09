@@ -14,8 +14,8 @@
 ```bash
 git clone git@github.com:PerfilovStanislav/php-dto-benchmark.git
 cd php-dto-benchmark
-docker-compose up -d
-docker-compose exec php composer install
-docker-compose exec php ./vendor/bin/phpbench run tests/Benchmark/FullCheckBench.php --report='{"extends": "aggregate", "cols": ["subject", "mem_peak", "best", "worst", "mean", "mode"]}'
-docker-compose down
+docker compose up -d
+docker compose exec composer sh -c "composer install"
+docker compose exec composer sh -c "composer test"
+docker compose down
 ```
