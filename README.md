@@ -1,5 +1,5 @@
 ## Benchmark
-<img width="746" alt="image" src="dto-benchmark.gif">
+<img width="746" alt="image" src="dto-benchmark2.gif">
 
 ## Used libraries
 1) https://github.com/PerfilovStanislav/php-dto-packer
@@ -8,7 +8,8 @@
 4) https://github.com/EventSaucePHP/ObjectHydrator
 5) https://github.com/TheDragonCode/simple-data-transfer-object
 6) https://github.com/symfony/serializer
-7) https://github.com/cuyz/valinorfile
+7) https://github.com/CuyZ/Valinor
+8) https://github.com/jolicode/automapper
 
 ## Using
 ```bash

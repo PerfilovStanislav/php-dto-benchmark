@@ -3,40 +3,23 @@
 namespace Tests\Benchmark;
 
 use ClassTransformer\Hydrator;
-use Doctrine\Common\Annotations\AnnotationReader;
+use CuyZ\Valinor\MapperBuilder;
 use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
-use Jane\Component\AutoMapper\AutoMapper;
-use Jane\Component\AutoMapper\Generator\Generator;
-use Jane\Component\AutoMapper\Loader\FileLoader;
-use PhpParser\ParserFactory;
+use AutoMapper\AutoMapper;
 use PHPUnit\Framework\TestCase;
-
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-
 use Tests\Benchmark\PackerDTO\PurchaseDTO as PackerPurchaseDTO;
+use Tests\Benchmark\JolicodeDTO\PurchaseDTO as JolicodePurchaseDTO;
 use Tests\Benchmark\YzenDTO\PurchaseDTO as YzenPurchaseDTO;
 use Tests\Benchmark\CuyzDTO\PurchaseDTO as CuyzPurchaseDTO;
 use Tests\Benchmark\EventSauceDTO\PurchaseDTO as EventSaucePurchaseDTO;
 use Tests\Benchmark\SpatieDTO\PurchaseDTO as SpatiePurchaseDTO;
 use Tests\Benchmark\SimpleDTO\PurchaseDTO as DragonPurchaseDTO;
 
-/**
- * Class CheckBench
- *
- * @package Tests\Benchmark
- *
- * ./vendor/bin/phpbench run tests/Benchmark/CheckBench.php --report=default
- */
 class FullCheckBench extends TestCase
 {
-
-    public static FileLoader $fileLoaderForJane;
-    
     private array $data;
     
     public function __construct(?string $name = null, array $data = [], $dataName = '')
@@ -44,7 +27,6 @@ class FullCheckBench extends TestCase
         $this->data = $this->getPurcheseObject();
         parent::__construct($name, $data, $dataName);
     }
-
 
     /**
      * @Revs(1500)
@@ -61,32 +43,10 @@ class FullCheckBench extends TestCase
      * @Iterations(11)
      * @Warmup(3)
      */
-    public function benchJane(): void
-    {
-        if (false === isset(static::$fileLoaderForJane)) {
-            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-            static::$fileLoaderForJane = new FileLoader(new Generator(
-                (new ParserFactory())->create(ParserFactory::PREFER_PHP7),
-                new ClassDiscriminatorFromClassMetadata($classMetadataFactory)
-            ), __DIR__ . '/cache');
-
-        }
-
-        $autoMapper = AutoMapper::create(true, static::$fileLoaderForJane);
-        $autoMapper->map($this->data, YzenPurchaseDTO::class);
-    }
-
-
-    /**
-     * @Revs(1500)
-     * @Iterations(11)
-     * @Warmup(3)
-     */
     public function benchYzen(): void
     {
         Hydrator::init()->create(YzenPurchaseDTO::class, $this->data);
     }
-
 
     /**
      * @Revs(1500)
@@ -108,7 +68,6 @@ class FullCheckBench extends TestCase
         $mapper = new ObjectMapperUsingReflection();
         $mapper->hydrateObject(EventSaucePurchaseDTO::class, $this->data);
     }
-
 
     /**
      * @Revs(1500)
@@ -139,9 +98,20 @@ class FullCheckBench extends TestCase
      */
     public function benchCuyz(): void
     {
-        (new \CuyZ\Valinor\MapperBuilder())
+        (new MapperBuilder())
             ->mapper()
             ->map(CuyzPurchaseDTO::class, \CuyZ\Valinor\Mapper\Source\Source::array($this->data));
+    }
+
+    /**
+     * @Revs(30)
+     * @Iterations(11)
+     * @Warmup(3)
+     */
+    public function benchJolicode(): void
+    {
+        $automapper = AutoMapper::create();
+        $automapper->map($this->data, JolicodePurchaseDTO::class);
     }
 
     public function getPurcheseObject(): array
