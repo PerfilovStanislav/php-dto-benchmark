@@ -1,5 +1,5 @@
 ## Benchmark
-<img width="746" alt="image" src="dto-benchmark2.gif">
+<img alt="image" src="dto-benchmark.gif">
 
 ## Used libraries
 1) https://github.com/PerfilovStanislav/php-dto-packer
